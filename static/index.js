@@ -68786,6 +68786,7 @@ module.exports = React.createClass({displayName: "exports",
       },
       success: function (data) {
         if (!data.e) {
+          console.log(data.a);
           let user = data.a;
           Cookie.set('user', user);
           that.transitionTo('main', {username: user.username});

@@ -5,8 +5,10 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from django.views.generic.base import View
 from django.db.models import Q
+from rest_framework.renderers import JSONRenderer
 
 from .models import User
+from .serializers import UserSerializer
 
 
 class HomeView(View):
@@ -24,9 +26,8 @@ class SignInView(View):
                             password=request.POST['password'])
         if user:
             login(request, user)
-            return JsonResponse({'a': {'username': user.username,
-                                       'first_name': user.first_name,
-                                       'last_name': user.last_name}})
+            serializer = UserSerializer(user)
+            return JsonResponse({'a': serializer.data})
         else:
             return JsonResponse({'e': 'Невірний логін або пароль'})
 
