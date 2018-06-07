@@ -68984,7 +68984,7 @@ module.exports = React.createClass({displayName: "exports",
     setTimeout(()=>{this.refs.snack.dismiss()}, 4000);
     var user = this.context.router.getCurrentParams().user;
     $.ajax({
-      url: this.props.url + 'add-contact/',
+      url: this.props.url + 'create-contact/',
       method: 'POST',
       data: {user: user, contact: this.props.user[0]}
     });
@@ -69396,7 +69396,7 @@ module.exports = React.createClass({displayName: "exports",
     return {url: 'http://127.0.0.1:8000/'};
   },
   getInitialState() {
-    return {contacts: null};
+    return {contacts: null, rooms: null, audiences: null};
   },
   getAllContacts() {
     const user = Cookie.getJSON('user');
@@ -69412,7 +69412,7 @@ module.exports = React.createClass({displayName: "exports",
   },
   onContactClick(e, i) {
     let contact = this.state.contacts[i];
-    this.props.set(windowTypes.CONTACT, 'c'+contact.id);
+    this.props.set(windowTypes.VIDEO, contact.id);
   },
   onRoomClick(e,i) {
     var r = this.state.rooms[i];
@@ -69422,16 +69422,16 @@ module.exports = React.createClass({displayName: "exports",
     var a = this.state.audiences[i];
     this.props.set(windowTypes.VIDEO, 'a'+a.id);
   },
-  newAudience() {
+  createAudience() {
     this.props.set(windowTypes.AUDIENCE, this.state.contacts);
   },
-  newRoom() {
+  createRoom() {
     this.props.set(windowTypes.ROOM, this.state.contacts);
   },
   componentWillReceiveProps(next) {
-    var oldRooms = this.state.rooms;
-    var oldAudiences = this.state.audiences;
-    if (next.r&&this.state.rooms.indexOf(next.r)===-1) {
+    let oldRooms = this.state.rooms;
+    let oldAudiences = this.state.audiences;
+    if (next.r && this.state.rooms.indexOf(next.r)===-1) {
       alert('next r ' + next.r.id);
       oldRooms.push(next.r);
     }
@@ -69445,28 +69445,29 @@ module.exports = React.createClass({displayName: "exports",
     this.setState({rooms: oldRooms, audiences: oldAudiences});
   },
   render() {
-    var rooms = [], audiences = [], contacts = [];
-    if (!this.state.contacts) {
-      this.getAllContacts().then((d)=>{this.setState({contacts: d.a})});
+    let rooms = [], audiences = [], contacts = [];
+    if (!this.state.contacts && !this.state.rooms && !this.state.audiences) {
+      this.getAllContacts().then((res)=>{console.log(res.a);this.setState({
+        contacts: res.a.contacts, rooms: res.a.rooms, audiences: res.a.audiences})});
     } else {
-      // rooms = this.state.rooms.map((r)=>({text: r.name +' | '+r.id}));
-      // audiences = this.state.audiences.map((a)=>({text: a.name+' | '+a.id}));
-      // if (rooms) {
-      //   rooms = <Menu menuItems={rooms} onItemTap={this.onRoomClick} autoWidth={false} zDepth={0}/>;
-      // }
-      // if (audiences) {
-      //   audiences = <Menu menuItems={audiences} onItemTap={this.onAudienceClick} autoWidth={false} zDepth={0}/>;
-      // }
-        contacts = this.state.contacts.map((c) => ({text: c.first_name+' '+c.last_name}))
-        if (contacts) {
-              contacts = React.createElement(Menu, {menuItems: contacts, onItemTap: this.onContactClick, autoWidth: false, zDepth: 0});
-        }
+      rooms = this.state.rooms.map((r)=>({text: r.name}));
+      if (rooms) {
+        rooms = React.createElement(Menu, {menuItems: rooms, onItemTap: this.onRoomClick, autoWidth: false, zDepth: 0});
+      }
+      audiences = this.state.audiences.map((a)=>({text: a.name}));
+      if (audiences) {
+        audiences = React.createElement(Menu, {menuItems: audiences, onItemTap: this.onAudienceClick, autoWidth: false, zDepth: 0});
+      }
+      contacts = this.state.contacts.map((c) => ({text: c.first_name+' '+c.last_name}));
+      if (contacts) {
+        contacts = React.createElement(Menu, {menuItems: contacts, onItemTap: this.onContactClick, autoWidth: false, zDepth: 0});
+      }
     }
     return (
       React.createElement("div", {className: "home_tab"}, 
         React.createElement(ScrollBar, null, 
-          React.createElement(FlatButton, {onClick: this.newAudience, style: {width: '50%'}, label: 'Нова аудиторія'}), 
-          React.createElement(FlatButton, {onClick: this.newRoom, style: {float: 'right', width: '50%'}, label: 'Нова кімната'}), 
+          React.createElement(FlatButton, {onClick: this.createAudience, style: {width: '50%'}, label: 'Нова аудиторія'}), 
+          React.createElement(FlatButton, {onClick: this.createRoom, style: {float: 'right', width: '50%'}, label: 'Нова кімната'}), 
           React.createElement(List, {subheader: "Контакти", subheaderStyle: {fontSize: '1.2em'}}, 
             contacts
           ), 
@@ -69614,16 +69615,17 @@ module.exports = React.createClass({displayName: "exports",
   },
   create() {
     var username = Cookie.getJSON('user').username;
-    var contacts = this.state.contacts.join('/');
+    var contacts = this.state.contacts;
     var name = this.state.name;
     if (name&&contacts) {
       ajax({
-        url: this.props.url + 'createaudience/',
+        url: this.props.url + 'create-group/',
         method: 'POST',
         data: {
           username: username,
           name: name,
-          contacts: contacts
+          contacts: contacts,
+          root: true,
         }
       });
     }
@@ -69690,7 +69692,7 @@ module.exports = React.createClass({displayName: "exports",
     var user = Cookie.getJSON('user');
     var contact = this.props.contact;
     ajax({
-      url: this.props.url + 'add-contact/',
+      url: this.props.url + 'create-contact/',
       method: 'POST',
       data: {
         user: user.username,
@@ -69742,16 +69744,17 @@ module.exports = React.createClass({displayName: "exports",
   create() {
     var that = this;
     var username = Cookie.getJSON('user').username;
-    var contacts = this.state.contacts.join('/');
+    var contacts = this.state.contacts;
     var name = this.state.name;
     if (name&&contacts) {
         ajax({
-          url: this.props.url + 'createroom/',
+          url: this.props.url + 'create-group/',
           method: 'POST',
           data: {
             username: username,
             name: name,
-            contacts: contacts
+            contacts: contacts,
+            root: false,
           },
           success: function (d) {
             that.props.close(d.a, 'room');

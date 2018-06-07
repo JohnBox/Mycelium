@@ -22,7 +22,8 @@ urlpatterns = [
     path('sign-in/', views.SignInView.as_view(), name='sign-in'),
     path('sign-up/', views.SignUpView.as_view(), name='sign-up'),
     path('users-list/', views.UsersListView.as_view(), name='users-list'),
-    path('contacts-list/', views.ContactsListView.as_view(), name='contacts-list'),
     path('user-edit/', views.UserEditView.as_view(), name='user-edit'),
-    path('add-contact/', views.AddContactView.as_view(), name='add-contact'),
+    path('contacts-list/', views.ContactsListView.as_view(), name='contacts-list'),
+    path('create-contact/', views.CreateContactView.as_view(), name='create-contact'),
+    path('create-group/', views.CreateGroupView.as_view(), name='create-group'),
 ]
