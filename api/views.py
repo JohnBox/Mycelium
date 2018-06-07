@@ -73,21 +73,19 @@ class UsersListView(View):
         serializer = UserSerializer(users, many=True)
         return JsonResponse({'a': serializer.data})
 
-'''
-@csrf_exempt
-def getallcontacts(request):
-    if request.method == 'POST':
+
+class ContactsListView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ContactsListView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request):
         user = User.objects.get(username=request.POST['username'])
-        contacts = Contact.objects.filter(user=user)
-        conv = lambda c: {'username': c.contact.username,
-                          'first_name': c.contact.first_name,
-                          'last_name': c.contact.last_name
+        serializer = UserSerializer(user.contacts, many=True)
+        return JsonResponse({'a': serializer.data})
 
-                          }
-        print(list(map(conv, contacts)))
-        return JsonResponse({'a': list(map(conv, contacts))})
-    return None
 
+'''
 @csrf_exempt
 def addcontacttouser(request):
     if request.method == 'POST':

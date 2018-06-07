@@ -68787,6 +68787,7 @@ module.exports = React.createClass({displayName: "exports",
       success: function (data) {
         if (!data.e) {
           let user = data.a;
+          console.log(user);
           Cookie.set('user', user);
           that.transitionTo('main', {username: user.username});
         } else {
@@ -69379,15 +69380,15 @@ module.exports = React.createClass({displayName: "exports",
 });
 
 },{"./../Button/UserProfileButton":"/home/gott/projects/ToxIn-client/src/components/Button/UserProfileButton.js","./../Tab/Tab":"/home/gott/projects/ToxIn-client/src/components/Tab/Tab.js","js-cookie":"/home/gott/projects/ToxIn-client/node_modules/js-cookie/src/js.cookie.js","material-ui":"/home/gott/projects/ToxIn-client/node_modules/material-ui/lib/index.js","react":"/home/gott/projects/ToxIn-client/node_modules/react/react.js","react-router":"/home/gott/projects/ToxIn-client/node_modules/react-router/lib/index.js"}],"/home/gott/projects/ToxIn-client/src/components/Tab/HomeTab.js":[function(require,module,exports){
-var React = require('react');
-var $ = require('jquery');
-var Cookie = require('js-cookie');
-var ScrollBar = require('react-scrollbar');
-var mui = require('material-ui');
-var { Paper, TextField, Menu, SubheaderMenuItem, SvgIcon, FlatButton, List, ListDivider} = mui;
-var StylePropable = mui.Mixins.StylePropable;
-var Colors = mui.Styles.Colors;
-var windowTypes = require('../windows');
+const React = require('react');
+const $ = require('jquery');
+const Cookie = require('js-cookie');
+const ScrollBar = require('react-scrollbar');
+const mui = require('material-ui');
+const { Paper, TextField, Menu, SubheaderMenuItem, SvgIcon, FlatButton, List, ListDivider } = mui;
+const StylePropable = mui.Mixins.StylePropable;
+const Colors = mui.Styles.Colors;
+const windowTypes = require('../windows');
 
 
 
@@ -69396,19 +69397,23 @@ module.exports = React.createClass({displayName: "exports",
     return {url: 'http://127.0.0.1:8000/'};
   },
   getInitialState() {
-    return {contacts: null, rooms: null, audiences: null};
+    return {contacts: null};
   },
   getAllContacts() {
-    var username = Cookie.getJSON('user').username;
+    const user = Cookie.getJSON('user');
     return new Promise((resolve, reject)=>{
       $.ajax({
-        url: this.props.url + 'getallcontacts/',
+        url: this.props.url + 'contacts-list/',
         method: 'POST',
-        data: {username: username},
+        data: {username: user.username},
         success: resolve,
         error: reject
       });
     });
+  },
+  onContactClick(e, i) {
+    let contact = this.state.contacts[i];
+    this.props.set(windowTypes.CONTACT, 'c'+contact.id);
   },
   onRoomClick(e,i) {
     var r = this.state.rooms[i];
@@ -69441,27 +69446,36 @@ module.exports = React.createClass({displayName: "exports",
     this.setState({rooms: oldRooms, audiences: oldAudiences});
   },
   render() {
-    var rooms = [], audiences = [];
-    if (!this.state.contacts&&!this.state.rooms&&!this.state.audiences) {
-      this.getAllContacts().then((d)=>{this.setState({contacts: d.a.contacts, rooms: d.a.rooms, audiences: d.a.audiences})});
+    var rooms = [], audiences = [], contacts = [];
+    if (!this.state.contacts) {
+      this.getAllContacts().then((d)=>{this.setState({contacts: d.a})});
     } else {
-      rooms = this.state.rooms.map((r)=>({text: r.name +' | '+r.id}));
-      audiences = this.state.audiences.map((a)=>({text: a.name+' | '+a.id}));
-      if (rooms) {
-        rooms = React.createElement(Menu, {menuItems: rooms, onItemTap: this.onRoomClick, autoWidth: false, zDepth: 0});
-      }
-      if (audiences) {
-        audiences = React.createElement(Menu, {menuItems: audiences, onItemTap: this.onAudienceClick, autoWidth: false, zDepth: 0});
-      }
+      // rooms = this.state.rooms.map((r)=>({text: r.name +' | '+r.id}));
+      // audiences = this.state.audiences.map((a)=>({text: a.name+' | '+a.id}));
+      // if (rooms) {
+      //   rooms = <Menu menuItems={rooms} onItemTap={this.onRoomClick} autoWidth={false} zDepth={0}/>;
+      // }
+      // if (audiences) {
+      //   audiences = <Menu menuItems={audiences} onItemTap={this.onAudienceClick} autoWidth={false} zDepth={0}/>;
+      // }
+        contacts = this.state.contacts.map((c) => ({text: c.first_name+' '+c.last_name}))
+        if (contacts) {
+              contacts = React.createElement(Menu, {menuItems: contacts, onItemTap: this.onContactClick, autoWidth: false, zDepth: 0});
+        }
     }
     return (
       React.createElement("div", {className: "home_tab"}, 
         React.createElement(ScrollBar, null, 
           React.createElement(FlatButton, {onClick: this.newAudience, style: {width: '50%'}, label: 'Нова аудиторія'}), 
           React.createElement(FlatButton, {onClick: this.newRoom, style: {float: 'right', width: '50%'}, label: 'Нова кімната'}), 
+          React.createElement(List, {subheader: "Контакти", subheaderStyle: {fontSize: '1.2em'}}, 
+            contacts
+          ), 
+          React.createElement(ListDivider, null), 
           React.createElement(List, {subheader: "Аудиторії", subheaderStyle: {fontSize: '1.2em'}}, 
             audiences
           ), 
+          React.createElement(ListDivider, null), 
           React.createElement(List, {subheader: "Кімнати", subheaderStyle: {fontSize: '1.2em'}}, 
             rooms
           )

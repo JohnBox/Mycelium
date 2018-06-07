@@ -1,13 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.utils.text import gettext_lazy as _
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(User,
-                                on_delete=models.CASCADE,
-                                related_name='profile',
-                                verbose_name=_('user'))
+class User(AbstractUser):
     contacts = models.ManyToManyField('self',
                                       symmetrical=True,
                                       related_name='contacts',
@@ -20,7 +16,7 @@ class Profile(models.Model):
 
 
 class Group(models.Model):
-    creator = models.ForeignKey(Profile,
+    creator = models.ForeignKey(User,
                                 on_delete=models.DO_NOTHING,
                                 verbose_name=_('creator'))
     created = models.DateTimeField(_('created'), auto_now_add=True)
@@ -31,7 +27,7 @@ class Message(models.Model):
                               on_delete=models.CASCADE,
                               related_name='message',
                               verbose_name=_('group'))
-    creator = models.ForeignKey(Profile,
+    creator = models.ForeignKey(User,
                                 on_delete=models.DO_NOTHING,
                                 related_name='creator',
                                 verbose_name=_('creator')),
