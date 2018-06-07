@@ -85,6 +85,25 @@ class ContactsListView(View):
         return JsonResponse({'a': serializer.data})
 
 
+class UserEditView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(UserEditView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        print(request.POST)
+        username = request.POST['username']
+        user = User.objects.get(username=username)
+        user.first_name = request.POST['first_name']
+        user.last_name = request.POST['last_name']
+        user.email = request.POST['email']
+        user.save()
+        # user_profile.workplace = request.POST['workplace']
+        # user_profile.position = request.POST['position']
+        # user_profile.save()
+        return JsonResponse({'a': True})
+
+
 '''
 @csrf_exempt
 def addcontacttouser(request):
@@ -98,35 +117,4 @@ def addcontacttouser(request):
         return JsonResponse({'a': True})
     return None
 
-@csrf_exempt
-def getuserprofile(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        user = User.objects.get(username=username)
-        user_profile = UserProfile.objects.get(user=user)
-        conv = lambda up: {'first_name': up.user.first_name,
-                           'last_name': up.user.last_name,
-                           'email': up.user.email,
-                           'workplace': up.workplace,
-                           'position': up.position
-                           }
-        return JsonResponse({'a': conv(user_profile)})
-    return None
-
-@csrf_exempt
-def setuserprofile(request):
-    if request.method == 'POST':
-        print(request.POST)
-        username = request.POST['username']
-        user = User.objects.get(username=username)
-        user.first_name = request.POST['first_name']
-        user.last_name = request.POST['last_name']
-        user.email = request.POST['email']
-        user.save()
-        user_profile = UserProfile.objects.get(user=user)
-        user_profile.workplace = request.POST['workplace']
-        user_profile.position = request.POST['position']
-        user_profile.save()
-        return JsonResponse({'a': True})
-    return None
 '''

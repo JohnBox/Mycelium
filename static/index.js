@@ -68787,7 +68787,6 @@ module.exports = React.createClass({displayName: "exports",
       success: function (data) {
         if (!data.e) {
           let user = data.a;
-          console.log(user);
           Cookie.set('user', user);
           that.transitionTo('main', {username: user.username});
         } else {
@@ -69705,7 +69704,6 @@ module.exports = React.createClass({displayName: "exports",
     return (
       React.createElement(Paper, {className: "window", zDepth: 1, rounded: false}, 
         React.createElement("div", {className: "img"}, 
-          React.createElement("img", {src: "static/go.png", alt: ""}), 
           React.createElement(RaisedButton, {secondary: true, style: {width: '100%'}, label: "Додати", onClick: this.addContact})
         ), 
         React.createElement("div", {className: "info"}, 
@@ -69808,34 +69806,33 @@ var CheckBox = React.createClass({displayName: "CheckBox",
 });
 
 },{"../Button/CloseWindow":"/home/gott/projects/ToxIn-client/src/components/Button/CloseWindow.js","../windows":"/home/gott/projects/ToxIn-client/src/components/windows.js","jquery":"/home/gott/projects/ToxIn-client/node_modules/jquery/dist/jquery.js","js-cookie":"/home/gott/projects/ToxIn-client/node_modules/js-cookie/src/js.cookie.js","material-ui":"/home/gott/projects/ToxIn-client/node_modules/material-ui/lib/index.js","react":"/home/gott/projects/ToxIn-client/node_modules/react/react.js","react-router":"/home/gott/projects/ToxIn-client/node_modules/react-router/lib/index.js"}],"/home/gott/projects/ToxIn-client/src/components/Window/UserWindow.js":[function(require,module,exports){
-var React = require('react');
-var Cookie = require('js-cookie');
-var { Route, RouteHandler, Link, Navigation } = require('react-router');
-var { ajax } = require('jquery');
-var mui = require('material-ui');
-var { AppBar, Paper, RaisedButton, SvgIcon, TextField, DropDownMenu } = mui;
-var StylePropable = mui.Mixins.StylePropable;
-var CloseButton = require('../Button/CloseWindow');
+const React = require('react');
+const Cookie = require('js-cookie');
+const { Route, RouteHandler, Link, Navigation } = require('react-router');
+const { ajax } = require('jquery');
+const mui = require('material-ui');
+const { AppBar, Paper, RaisedButton, SvgIcon, TextField, DropDownMenu } = mui;
+const StylePropable = mui.Mixins.StylePropable;
+const CloseButton = require('../Button/CloseWindow');
 
 module.exports = React.createClass({displayName: "exports",
   getDefaultProps() {
     return {url: 'http://127.0.0.1:8000/'};
   },
   getInitialState() {
-    return {edit: false, user: null};
+    return {edit: false, user: Cookie.getJSON('user')};
   },
   edit() {
     this.setState({edit: !this.state.edit});
   },
   save() {
-    var user = Cookie.getJSON('user');
-    var username = user.username;
+    let user = this.state.user;
     if (user.first_name && user.last_name && user.email) {
       ajax({
-        url: this.props.url + 'setuserprofile/',
+        url: this.props.url + 'user-edit/',
         method: 'POST',
         data: {
-          username: username,
+          username: user.username,
           first_name: user.first_name,
           last_name: user.last_name,
           email: user.email,
@@ -69844,35 +69841,36 @@ module.exports = React.createClass({displayName: "exports",
         }
       });
       this.edit();
+      Cookie.set('user', user);
     }
   },
-  firstnameInput(e) {
-    var user = this.state.user;
+  firstNameInput(e) {
+    const user = this.state.user;
     user.first_name = e.target.value;
     this.setState({user: user});
   },
-  lastnameInput(e) {
-    var user = this.state.user;
+  lastNameInput(e) {
+    const user = this.state.user;
     user.last_name = e.target.value;
     this.setState({user: user});
   },
   emailInput(e) {
-    var user = this.state.user;
+    const user = this.state.user;
     user.email = e.target.value;
     this.setState({user: user});
   },
   workplaceInput(e) {
-    var user = this.state.user;
+    const user = this.state.user;
     user.workplace = e.target.value;
     this.setState({user: user});
   },
   positionInput(e) {
-    var user = this.state.user;
+    const user = this.state.user;
     user.position = e.target.value;
     this.setState({user: user});
   },
   getUserProfile() {
-    var username = this.props.user.username;
+    const username = this.props.user.username;
     return new Promise((resolve, reject)=>{
       ajax({
         url: this.props.url + 'getuserprofile/',
@@ -69884,8 +69882,8 @@ module.exports = React.createClass({displayName: "exports",
     });
   },
   render() {
-    var user = Cookie.getJSON('user');
-    var label, disabled, onClick;
+    const user = this.state.user;
+    let label, disabled, onClick;
     if (this.state.edit) {
       label = 'Зберегти';
       disabled = false;
@@ -69895,16 +69893,14 @@ module.exports = React.createClass({displayName: "exports",
       disabled = true;
       onClick = this.edit;
     }
-
     return (
       React.createElement(Paper, {className: "window", zDepth: 1, rounded: false}, 
         React.createElement("div", {className: "img"}, 
-          React.createElement("img", {src: "static/go.png", alt: ""}), 
           React.createElement(RaisedButton, {style: {width: '100%'}, label: label, onClick: onClick})
         ), 
         React.createElement("div", {className: "info"}, 
-          React.createElement(TextField, {disabled: disabled, value: user.first_name, onChange: this.firstnameInput, floatingLabelText: "Ім`я"}), 
-          React.createElement(TextField, {disabled: disabled, value: user.last_name, onChange: this.lastnameInput, floatingLabelText: "Прізвище"}), 
+          React.createElement(TextField, {disabled: disabled, value: user.first_name, onChange: this.firstNameInput, floatingLabelText: "Ім`я"}), 
+          React.createElement(TextField, {disabled: disabled, value: user.last_name, onChange: this.lastNameInput, floatingLabelText: "Прізвище"}), 
           React.createElement(TextField, {disabled: disabled, value: user.email, onChange: this.emailInput, floatingLabelText: "Електронна пошта"}), 
           React.createElement(TextField, {disabled: disabled, value: user.workplace, onChange: this.workplaceInput, floatingLabelText: "Місце роботи"}), 
           React.createElement(TextField, {disabled: disabled, value: user.position, onChange: this.positionInput, floatingLabelText: "Посада"})
