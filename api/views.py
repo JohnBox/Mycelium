@@ -55,16 +55,25 @@ class SignUpView(View):
             return JsonResponse({'a': True})
 
 
-'''
-@csrf_exempt
-def getallusers(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        conv = lambda u: {'username': u.username, 'first_name': u.first_name, 'last_name': u.last_name}
-        users = list(map(conv, User.objects.filter(is_staff=False).exclude(username=username)))
-        return JsonResponse({'a': users})
-    return None
+class UsersListView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(UsersListView, self).dispatch(request, *args, **kwargs)
 
+    def post(self, request):
+        username = request.POST['username']
+        users = User.objects.exclude(username=username)
+        search = request.POST.get('search')
+        if search:
+            users = users.filter(
+                Q(username__icontains=search) |
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search)
+            )
+        serializer = UserSerializer(users, many=True)
+        return JsonResponse({'a': serializer.data})
+
+'''
 @csrf_exempt
 def getallcontacts(request):
     if request.method == 'POST':

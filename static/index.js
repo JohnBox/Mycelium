@@ -68728,7 +68728,7 @@ module.exports = React.createClass({displayName: "exports",
     };
   },
   getInitialState() {
-    return {darkTheme: Cookies.get('darkTheme')||false};
+    return {darkTheme: Cookies.get('darkTheme') === 'true'};
   },
   toggleTheme() {
     this.setState({darkTheme: !this.state.darkTheme});
@@ -68786,7 +68786,6 @@ module.exports = React.createClass({displayName: "exports",
       },
       success: function (data) {
         if (!data.e) {
-          console.log(data.a);
           let user = data.a;
           Cookie.set('user', user);
           that.transitionTo('main', {username: user.username});
@@ -68965,7 +68964,7 @@ module.exports = React.createClass({displayName: "exports",
     router: React.PropTypes.func
   },
   getDefaultProps() {
-    return {url: 'http://91.225.146.97:8000/'};
+    return {url: 'http://127.0.0.1:8000/'};
   },
   getTheme() {
     return this.context.muiTheme.palette;
@@ -69394,7 +69393,7 @@ var windowTypes = require('../windows');
 
 module.exports = React.createClass({displayName: "exports",
   getDefaultProps() {
-    return {url: 'http://91.225.146.97:8000/'};
+    return {url: 'http://127.0.0.1:8000/'};
   },
   getInitialState() {
     return {contacts: null, rooms: null, audiences: null};
@@ -69473,14 +69472,14 @@ module.exports = React.createClass({displayName: "exports",
 });
 
 },{"../windows":"/home/gott/projects/ToxIn-client/src/components/windows.js","jquery":"/home/gott/projects/ToxIn-client/node_modules/jquery/dist/jquery.js","js-cookie":"/home/gott/projects/ToxIn-client/node_modules/js-cookie/src/js.cookie.js","material-ui":"/home/gott/projects/ToxIn-client/node_modules/material-ui/lib/index.js","react":"/home/gott/projects/ToxIn-client/node_modules/react/react.js","react-scrollbar":"/home/gott/projects/ToxIn-client/node_modules/react-scrollbar/dist/scrollArea.js"}],"/home/gott/projects/ToxIn-client/src/components/Tab/SearchTab.js":[function(require,module,exports){
-var React = require('react');
-var ScrollBar = require('react-scrollbar');
-var $ = require('jquery');
-var Cookie = require('js-cookie');
-var { Paper, TextField, Menu, SvgIcon, Snackbar } = require('material-ui');
-var AddIcon = require('../Button/AddContactButton');
+const React = require('react');
+const ScrollBar = require('react-scrollbar');
+const $ = require('jquery');
+const Cookie = require('js-cookie');
+const { Paper, TextField, Menu, SvgIcon, Snackbar } = require('material-ui');
+const AddIcon = require('../Button/AddContactButton');
 
-var windowTypes = {
+const windowTypes = {
   NONE: 0,
   USER: 1,
   CONTACT: 2,
@@ -69492,16 +69491,16 @@ module.exports = React.createClass({displayName: "exports",
     router: React.PropTypes.func
   },
   getDefaultProps() {
-    return {url: 'http://91.225.146.97:8000/'};
+    return {url: 'http://127.0.0.1:8000/'};
   },
   getInitialState() {
     return {users: null};
   },
-  getAllUsers() {
-    var username = Cookie.getJSON('user').username;
+  getUsersList() {
+    let username = Cookie.getJSON('user').username;
     return new Promise((resolve, reject)=>{
       $.ajax({
-        url: this.props.url + 'getallusers/',
+        url: this.props.url + 'users-list/',
         method: 'POST',
         data: {username: username},
         success: resolve,
@@ -69509,19 +69508,19 @@ module.exports = React.createClass({displayName: "exports",
       });
     });
   },
-  onUserClick(e,i) {
-    var contact = this.state.users[i];
-    this.props.set(windowTypes.CONTACT,contact);
+  onUserClick(e, i) {
+    let contact = this.state.users[i];
+    this.props.set(windowTypes.CONTACT, contact);
   },
   onSearch(e) {
-    var that = this;
-    var username = Cookie.getJSON('user').username;
+    const that = this;
+    const username = Cookie.getJSON('user').username;
     $.ajax({
-      url: this.props.url + 'searchusers/',
+      url: this.props.url + 'users-list/',
       method: 'POST',
       data: {
         username: username,
-        q: e.target.value
+        search: e.target.value
       },
       success: function (data) {
         that.setState({users: data.a})
@@ -69532,11 +69531,11 @@ module.exports = React.createClass({displayName: "exports",
     });
   },
   render() {
-    var users = [];
+    let users = [];
     if (!this.state.users) {
-      this.getAllUsers().then((data)=>{this.setState({users: data.a})});
+      this.getUsersList().then((data)=>{this.setState({users: data.a})});
     } else {
-      users = this.state.users.map((u)=>({text: u.first_name+' '+u.last_name}));
+      users = this.state.users.map((user)=>({text: user.first_name+' '+user.last_name}));
     }
     return (
       React.createElement("div", {className: "search_tab"}, 
@@ -69550,20 +69549,20 @@ module.exports = React.createClass({displayName: "exports",
 });
 
 },{"../Button/AddContactButton":"/home/gott/projects/ToxIn-client/src/components/Button/AddContactButton.js","jquery":"/home/gott/projects/ToxIn-client/node_modules/jquery/dist/jquery.js","js-cookie":"/home/gott/projects/ToxIn-client/node_modules/js-cookie/src/js.cookie.js","material-ui":"/home/gott/projects/ToxIn-client/node_modules/material-ui/lib/index.js","react":"/home/gott/projects/ToxIn-client/node_modules/react/react.js","react-scrollbar":"/home/gott/projects/ToxIn-client/node_modules/react-scrollbar/dist/scrollArea.js"}],"/home/gott/projects/ToxIn-client/src/components/Tab/SettingTab.js":[function(require,module,exports){
-var React = require('react');
-var Router = require('react-router');
-var { Route, RouteHandler, Link } = Router;
-var mui = require('material-ui');
-var { AppBar, Paper, Menu } = mui;
-var Cookies = require('js-cookie');
+const React = require('react');
+const Router = require('react-router');
+const { Route, RouteHandler, Link } = Router;
+const mui = require('material-ui');
+const { AppBar, Paper, Menu } = mui;
+const Cookies = require('js-cookie');
 
 module.exports = React.createClass({displayName: "exports",
   onToggle() {
-    Cookies.set('darkTheme', (!Cookies.get('darkTheme')));
+    Cookies.set('darkTheme', Cookies.get('darkTheme') !== 'true');
     this.props.toggleTheme();
   },
   render() {
-    var settings = [
+    const settings = [
       { text: 'Тема', toggle: true }
     ];
     return (
@@ -69595,7 +69594,7 @@ var GHB = require('../Button/GitHubButton');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://91.225.146.97:8000/'};
+    return {url: 'http://127.0.0.1:8000/'};
   },
   getInitialState() {
     return {contacts: [], name: null};
@@ -69672,7 +69671,7 @@ var CloseButton = require('../Button/CloseWindow');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://91.225.146.97:8000/'};
+    return {url: 'http://127.0.0.1:8000/'};
   },
   addContact() {
     var user = Cookie.getJSON('user').username;
@@ -69723,7 +69722,7 @@ var windowTypes = require('../windows');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://91.225.146.97:8000/'};
+    return {url: 'http://127.0.0.1:8000/'};
   },
   getInitialState() {
     return {contacts: [], name: null};
@@ -69806,7 +69805,7 @@ var CloseButton = require('../Button/CloseWindow');
 
 module.exports = React.createClass({displayName: "exports",
   getDefaultProps() {
-    return {url: 'http://91.225.146.97:8000/'};
+    return {url: 'http://127.0.0.1:8000/'};
   },
   getInitialState() {
     return {edit: false, user: null};
@@ -69919,7 +69918,7 @@ var localStream;
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://91.225.146.97:8000/', contact: null};
+    return {url: 'http://127.0.0.1:8000/', contact: null};
   },
   getInitialState() {
     return {rtc: new SimpleWebRTC({
