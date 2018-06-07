@@ -91,7 +91,6 @@ class UserEditView(View):
         return super(UserEditView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request):
-        print(request.POST)
         username = request.POST['username']
         user = User.objects.get(username=username)
         user.first_name = request.POST['first_name']
@@ -104,17 +103,16 @@ class UserEditView(View):
         return JsonResponse({'a': True})
 
 
-'''
-@csrf_exempt
-def addcontacttouser(request):
-    if request.method == 'POST':
-        contact = User.objects.get(username=request.POST['contact'])
-        user = User.objects.get(username=request.POST['user'])
-        creator = Contact(user=user, contact=contact, creator=True)
-        creator.save()
-        joined = Contact(user=contact, contact=user, creator=False)
-        joined.save()
-        return JsonResponse({'a': True})
-    return None
+class AddContactView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(AddContactView, self).dispatch(request, *args, **kwargs)
 
-'''
+    def post(self, request):
+        username = request.POST['user']
+        contact_username = request.POST['contact']
+        user = User.objects.get_by_natural_key(username)
+        contact = User.objects.get_by_natural_key(contact_username)
+        user.contacts.add(contact)
+        user.save()
+        return JsonResponse({'a': True})

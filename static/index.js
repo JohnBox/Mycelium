@@ -68984,7 +68984,7 @@ module.exports = React.createClass({displayName: "exports",
     setTimeout(()=>{this.refs.snack.dismiss()}, 4000);
     var user = this.context.router.getCurrentParams().user;
     $.ajax({
-      url: this.props.url + 'addcontacttouser',
+      url: this.props.url + 'add-contact/',
       method: 'POST',
       data: {user: user, contact: this.props.user[0]}
     });
@@ -69687,14 +69687,14 @@ module.exports = React.createClass({displayName: "exports",
     return {url: 'http://127.0.0.1:8000/'};
   },
   addContact() {
-    var user = Cookie.getJSON('user').username;
-    var contact= this.props.contact.username;
+    var user = Cookie.getJSON('user');
+    var contact = this.props.contact;
     ajax({
-      url: this.props.url + 'addcontacttouser/',
+      url: this.props.url + 'add-contact/',
       method: 'POST',
       data: {
-        user: user,
-        contact: contact
+        user: user.username,
+        contact: contact.username
       }
     });
     this.props.close();
