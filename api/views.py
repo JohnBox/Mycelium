@@ -83,7 +83,6 @@ class ContactsListView(View):
         contacts = UserSerializer(user.contacts, many=True).data
         rooms = GroupSerializer(user.groups.filter(root=False), many=True).data
         audiences = GroupSerializer(user.groups.filter(root=True), many=True).data
-        print(user.groups)
         return JsonResponse({'a': {
             'contacts': contacts,
             'rooms': rooms,
@@ -129,7 +128,6 @@ class CreateGroupView(View):
         return super(CreateGroupView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request):
-        print(request.POST)
         name = request.POST['name']
         root = request.POST['root'] == 'true'
         username = request.POST['username']
