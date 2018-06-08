@@ -68769,7 +68769,7 @@ const { RaisedButton, TextField } = require('material-ui');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/'};
+    return {url: 'http://192.168.31.128:8000/'};
   },
   getInitialState() {
     return {username: '', password: ''};
@@ -68824,7 +68824,7 @@ const { RaisedButton, TextField } = require('material-ui');
 
 module.exports = React.createClass({displayName: "exports",
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/'}
+    return {url: 'http://192.168.31.128:8000/'}
   },
   getInitialState() {
     return {username: '', first_name: '',last_name: '', email: '', password: '', confirm_password: ''};
@@ -68964,7 +68964,7 @@ module.exports = React.createClass({displayName: "exports",
     router: React.PropTypes.func
   },
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/'};
+    return {url: 'http://192.168.31.128:8000/'};
   },
   getTheme() {
     return this.context.muiTheme.palette;
@@ -69393,7 +69393,7 @@ const windowTypes = require('../windows');
 
 module.exports = React.createClass({displayName: "exports",
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/'};
+    return {url: 'http://192.168.31.128:8000/'};
   },
   getInitialState() {
     return {contacts: null, rooms: null, audiences: null};
@@ -69431,18 +69431,17 @@ module.exports = React.createClass({displayName: "exports",
   componentWillReceiveProps(next) {
     let oldRooms = this.state.rooms;
     let oldAudiences = this.state.audiences;
-    if (next.r && this.state.rooms.indexOf(next.r)===-1) {
-      alert('next r ' + next.r.id);
+    let oldContacts = this.state.contacts;
+    if (next.r) {
       oldRooms.push(next.r);
     }
     if (next.a) {
-      alert('next a '+next.a.id);
       oldAudiences.push(next.a);
     }
-    if (next.contact&&this.state) {
-
+    if (next.contact) {
+      oldContacts.push(next.contact)
     }
-    this.setState({rooms: oldRooms, audiences: oldAudiences});
+    this.setState({contacts: oldContacts, rooms: oldRooms, audiences: oldAudiences});
   },
   render() {
     let rooms = [], audiences = [], contacts = [];
@@ -69505,7 +69504,7 @@ module.exports = React.createClass({displayName: "exports",
     router: React.PropTypes.func
   },
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/'};
+    return {url: 'http://192.168.31.128:8000/'};
   },
   getInitialState() {
     return {users: null};
@@ -69608,7 +69607,7 @@ var GHB = require('../Button/GitHubButton');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/'};
+    return {url: 'http://192.168.31.128:8000/'};
   },
   getInitialState() {
     return {contacts: [], name: null};
@@ -69686,7 +69685,7 @@ var CloseButton = require('../Button/CloseWindow');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/'};
+    return {url: 'http://192.168.31.128:8000/'};
   },
   addContact() {
     var user = Cookie.getJSON('user');
@@ -69736,7 +69735,7 @@ var windowTypes = require('../windows');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/'};
+    return {url: 'http://192.168.31.128:8000/'};
   },
   getInitialState() {
     return {contacts: [], name: null};
@@ -69820,7 +69819,7 @@ const CloseButton = require('../Button/CloseWindow');
 
 module.exports = React.createClass({displayName: "exports",
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/'};
+    return {url: 'http://192.168.31.128:8000/'};
   },
   getInitialState() {
     return {edit: false, user: Cookie.getJSON('user')};
@@ -69931,7 +69930,7 @@ var localStream;
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/', contact: null};
+    return {url: 'http://192.168.31.128:8000/', contact: null};
   },
   getInitialState() {
     return {rtc: new SimpleWebRTC({
@@ -69944,7 +69943,7 @@ module.exports = React.createClass({displayName: "exports",
     this.setState({contact: this.props.contact})
   },
   componentWillReceiveProps(next) {
-    if (m=next.contact != this.state.contact) {
+    if (next.contact !== this.state.contact) {
       this.setState({contact: next.contact});
     } else {
 
@@ -69954,6 +69953,7 @@ module.exports = React.createClass({displayName: "exports",
     this.state.rtc.leaveRoom();
   },
   render() {
+    alert();
     this.state.rtc.joinRoom(this.state.contact);
     return (
       React.createElement(Paper, {className: "window", zDepth: 1, rounded: false}, 
