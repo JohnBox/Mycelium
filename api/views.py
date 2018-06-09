@@ -96,8 +96,9 @@ class UserEditView(View):
         return super(UserEditView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request):
-        username = request.POST['username']
-        user = User.objects.get(username=username)
+        pk = request.POST['pk']
+        user = User.objects.get(pk=pk)
+        user.username = request.POST['username']
         user.first_name = request.POST['first_name']
         user.last_name = request.POST['last_name']
         user.email = request.POST['email']

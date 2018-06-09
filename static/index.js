@@ -67831,17 +67831,18 @@ module.exports = React.createClass({displayName: "exports",
     const contact = this.props.contact;
     return (
       React.createElement(Paper, {className: "window", zDepth: 1, rounded: false}, 
-        React.createElement("div", {className: "img"}, 
-          React.createElement(RaisedButton, {secondary: true, style: {width: '100%'}, label: "Додати", onClick: this.addContact})
-        ), 
+        React.createElement(CloseButton, {onClick: this.props.closeWindow}), 
         React.createElement("div", {className: "info"}, 
           React.createElement(TextField, {disabled: true, value: contact.first_name, floatingLabelText: "Ім`я"}), 
           React.createElement(TextField, {disabled: true, value: contact.last_name, floatingLabelText: "Прізвище"}), 
+          React.createElement(TextField, {disabled: true, value: contact.username, floatingLabelText: "Логін"}), 
           React.createElement(TextField, {disabled: true, value: contact.email, floatingLabelText: "Електронна пошта"}), 
           React.createElement(TextField, {disabled: true, value: contact.workplace, floatingLabelText: "Місце роботи"}), 
           React.createElement(TextField, {disabled: true, value: contact.position, floatingLabelText: "Посада"})
         ), 
-        React.createElement(CloseButton, {onClick: this.props.closeWindow})
+        React.createElement("div", {className: "img"}, 
+          React.createElement(RaisedButton, {secondary: true, style: {width: '100%'}, label: "Додати", onClick: this.addContact})
+        )
       )
     );
   }
@@ -67956,11 +67957,13 @@ module.exports = React.createClass({displayName: "exports",
   },
   save() {
     let user = this.state.user;
-    if (user.first_name && user.last_name && user.email) {
+    console.log(user);
+    if (user.first_name && user.last_name && user.email && user.username) {
       ajax({
         url: this.props.url + 'user-edit/',
         method: 'POST',
         data: {
+          pk: user.id,
           username: user.username,
           first_name: user.first_name,
           last_name: user.last_name,
@@ -67981,6 +67984,11 @@ module.exports = React.createClass({displayName: "exports",
   lastNameInput(e) {
     const user = this.state.user;
     user.last_name = e.target.value;
+    this.setState({user: user});
+  },
+  usernameInput(e) {
+    const user = this.state.user;
+    user.username = e.target.value;
     this.setState({user: user});
   },
   emailInput(e) {
@@ -68024,17 +68032,18 @@ module.exports = React.createClass({displayName: "exports",
     }
     return (
       React.createElement(Paper, {className: "window", zDepth: 1, rounded: false}, 
-        React.createElement("div", {className: "img"}, 
-          React.createElement(RaisedButton, {style: {width: '100%'}, label: label, onClick: onClick})
-        ), 
+        React.createElement(CloseButton, {onClick: this.props.closeWindow}), 
         React.createElement("div", {className: "info"}, 
           React.createElement(TextField, {disabled: disabled, value: user.first_name, onChange: this.firstNameInput, floatingLabelText: "Ім`я"}), 
           React.createElement(TextField, {disabled: disabled, value: user.last_name, onChange: this.lastNameInput, floatingLabelText: "Прізвище"}), 
+          React.createElement(TextField, {disabled: disabled, value: user.username, onChange: this.usernameInput, floatingLabelText: "Логін"}), 
           React.createElement(TextField, {disabled: disabled, value: user.email, onChange: this.emailInput, floatingLabelText: "Електронна пошта"}), 
           React.createElement(TextField, {disabled: disabled, value: user.workplace, onChange: this.workplaceInput, floatingLabelText: "Місце роботи"}), 
           React.createElement(TextField, {disabled: disabled, value: user.position, onChange: this.positionInput, floatingLabelText: "Посада"})
         ), 
-        React.createElement(CloseButton, {onClick: this.props.closeWindow})
+        React.createElement("div", {className: "img"}, 
+          React.createElement(RaisedButton, {style: {width: '100%'}, label: label, onClick: onClick})
+        )
       )
     );
   }
