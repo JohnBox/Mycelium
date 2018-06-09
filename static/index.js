@@ -434,6 +434,172 @@ module.exports = function(obj, fn){
   }
 };
 
+},{}],"/home/gott/projects/ToxIn-client/node_modules/component-emitter/index.js":[function(require,module,exports){
+
+/**
+ * Expose `Emitter`.
+ */
+
+module.exports = Emitter;
+
+/**
+ * Initialize a new `Emitter`.
+ *
+ * @api public
+ */
+
+function Emitter(obj) {
+  if (obj) return mixin(obj);
+};
+
+/**
+ * Mixin the emitter properties.
+ *
+ * @param {Object} obj
+ * @return {Object}
+ * @api private
+ */
+
+function mixin(obj) {
+  for (var key in Emitter.prototype) {
+    obj[key] = Emitter.prototype[key];
+  }
+  return obj;
+}
+
+/**
+ * Listen on the given `event` with `fn`.
+ *
+ * @param {String} event
+ * @param {Function} fn
+ * @return {Emitter}
+ * @api public
+ */
+
+Emitter.prototype.on =
+Emitter.prototype.addEventListener = function(event, fn){
+  this._callbacks = this._callbacks || {};
+  (this._callbacks[event] = this._callbacks[event] || [])
+    .push(fn);
+  return this;
+};
+
+/**
+ * Adds an `event` listener that will be invoked a single
+ * time then automatically removed.
+ *
+ * @param {String} event
+ * @param {Function} fn
+ * @return {Emitter}
+ * @api public
+ */
+
+Emitter.prototype.once = function(event, fn){
+  var self = this;
+  this._callbacks = this._callbacks || {};
+
+  function on() {
+    self.off(event, on);
+    fn.apply(this, arguments);
+  }
+
+  on.fn = fn;
+  this.on(event, on);
+  return this;
+};
+
+/**
+ * Remove the given callback for `event` or all
+ * registered callbacks.
+ *
+ * @param {String} event
+ * @param {Function} fn
+ * @return {Emitter}
+ * @api public
+ */
+
+Emitter.prototype.off =
+Emitter.prototype.removeListener =
+Emitter.prototype.removeAllListeners =
+Emitter.prototype.removeEventListener = function(event, fn){
+  this._callbacks = this._callbacks || {};
+
+  // all
+  if (0 == arguments.length) {
+    this._callbacks = {};
+    return this;
+  }
+
+  // specific event
+  var callbacks = this._callbacks[event];
+  if (!callbacks) return this;
+
+  // remove all handlers
+  if (1 == arguments.length) {
+    delete this._callbacks[event];
+    return this;
+  }
+
+  // remove specific handler
+  var cb;
+  for (var i = 0; i < callbacks.length; i++) {
+    cb = callbacks[i];
+    if (cb === fn || cb.fn === fn) {
+      callbacks.splice(i, 1);
+      break;
+    }
+  }
+  return this;
+};
+
+/**
+ * Emit `event` with the given args.
+ *
+ * @param {String} event
+ * @param {Mixed} ...
+ * @return {Emitter}
+ */
+
+Emitter.prototype.emit = function(event){
+  this._callbacks = this._callbacks || {};
+  var args = [].slice.call(arguments, 1)
+    , callbacks = this._callbacks[event];
+
+  if (callbacks) {
+    callbacks = callbacks.slice(0);
+    for (var i = 0, len = callbacks.length; i < len; ++i) {
+      callbacks[i].apply(this, args);
+    }
+  }
+
+  return this;
+};
+
+/**
+ * Return array of callbacks for `event`.
+ *
+ * @param {String} event
+ * @return {Array}
+ * @api public
+ */
+
+Emitter.prototype.listeners = function(event){
+  this._callbacks = this._callbacks || {};
+  return this._callbacks[event] || [];
+};
+
+/**
+ * Check if this emitter has `event` handlers.
+ *
+ * @param {String} event
+ * @return {Boolean}
+ * @api public
+ */
+
+Emitter.prototype.hasListeners = function(event){
+  return !! this.listeners(event).length;
+};
+
 },{}],"/home/gott/projects/ToxIn-client/node_modules/component-inherit/index.js":[function(require,module,exports){
 
 module.exports = function(a, b){
@@ -442,6 +608,145 @@ module.exports = function(a, b){
   a.prototype = new fn;
   a.prototype.constructor = a;
 };
+},{}],"/home/gott/projects/ToxIn-client/node_modules/debug/debug.js":[function(require,module,exports){
+
+/**
+ * Expose `debug()` as the module.
+ */
+
+module.exports = debug;
+
+/**
+ * Create a debugger with the given `name`.
+ *
+ * @param {String} name
+ * @return {Type}
+ * @api public
+ */
+
+function debug(name) {
+  if (!debug.enabled(name)) return function(){};
+
+  return function(fmt){
+    fmt = coerce(fmt);
+
+    var curr = new Date;
+    var ms = curr - (debug[name] || curr);
+    debug[name] = curr;
+
+    fmt = name
+      + ' '
+      + fmt
+      + ' +' + debug.humanize(ms);
+
+    // This hackery is required for IE8
+    // where `console.log` doesn't have 'apply'
+    window.console
+      && console.log
+      && Function.prototype.apply.call(console.log, console, arguments);
+  }
+}
+
+/**
+ * The currently active debug mode names.
+ */
+
+debug.names = [];
+debug.skips = [];
+
+/**
+ * Enables a debug mode by name. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} name
+ * @api public
+ */
+
+debug.enable = function(name) {
+  try {
+    localStorage.debug = name;
+  } catch(e){}
+
+  var split = (name || '').split(/[\s,]+/)
+    , len = split.length;
+
+  for (var i = 0; i < len; i++) {
+    name = split[i].replace('*', '.*?');
+    if (name[0] === '-') {
+      debug.skips.push(new RegExp('^' + name.substr(1) + '$'));
+    }
+    else {
+      debug.names.push(new RegExp('^' + name + '$'));
+    }
+  }
+};
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+debug.disable = function(){
+  debug.enable('');
+};
+
+/**
+ * Humanize the given `ms`.
+ *
+ * @param {Number} m
+ * @return {String}
+ * @api private
+ */
+
+debug.humanize = function(ms) {
+  var sec = 1000
+    , min = 60 * 1000
+    , hour = 60 * min;
+
+  if (ms >= hour) return (ms / hour).toFixed(1) + 'h';
+  if (ms >= min) return (ms / min).toFixed(1) + 'm';
+  if (ms >= sec) return (ms / sec | 0) + 's';
+  return ms + 'ms';
+};
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+debug.enabled = function(name) {
+  for (var i = 0, len = debug.skips.length; i < len; i++) {
+    if (debug.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (var i = 0, len = debug.names.length; i < len; i++) {
+    if (debug.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * Coerce `val`.
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+
+// persist
+
+try {
+  if (window.localStorage) debug.enable(localStorage.debug);
+} catch(e){}
+
 },{}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/index.js":[function(require,module,exports){
 
 module.exports =  require('./lib/');
@@ -1167,7 +1472,7 @@ Socket.prototype.filterUpgrades = function (upgrades) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./transport":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transport.js","./transports":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transports/index.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/component-emitter/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/debug/browser.js","engine.io-parser":"/home/gott/projects/ToxIn-client/node_modules/engine.io-parser/lib/browser.js","indexof":"/home/gott/projects/ToxIn-client/node_modules/indexof/index.js","parsejson":"/home/gott/projects/ToxIn-client/node_modules/parsejson/index.js","parseqs":"/home/gott/projects/ToxIn-client/node_modules/parseqs/index.js","parseuri":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/parseuri/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transport.js":[function(require,module,exports){
+},{"./transport":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transport.js","./transports":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transports/index.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/component-emitter/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/debug/browser.js","engine.io-parser":"/home/gott/projects/ToxIn-client/node_modules/engine.io-parser/lib/browser.js","indexof":"/home/gott/projects/ToxIn-client/node_modules/indexof/index.js","parsejson":"/home/gott/projects/ToxIn-client/node_modules/parsejson/index.js","parseqs":"/home/gott/projects/ToxIn-client/node_modules/parseqs/index.js","parseuri":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/parseuri/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transport.js":[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -1328,7 +1633,7 @@ Transport.prototype.onClose = function () {
   this.emit('close');
 };
 
-},{"component-emitter":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/component-emitter/index.js","engine.io-parser":"/home/gott/projects/ToxIn-client/node_modules/engine.io-parser/lib/browser.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports){
+},{"component-emitter":"/home/gott/projects/ToxIn-client/node_modules/component-emitter/index.js","engine.io-parser":"/home/gott/projects/ToxIn-client/node_modules/engine.io-parser/lib/browser.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies
@@ -2010,7 +2315,7 @@ function unloadHandler() {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./polling":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transports/polling.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/component-emitter/index.js","component-inherit":"/home/gott/projects/ToxIn-client/node_modules/component-inherit/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/debug/browser.js","xmlhttprequest":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/xmlhttprequest.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports){
+},{"./polling":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transports/polling.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/component-emitter/index.js","component-inherit":"/home/gott/projects/ToxIn-client/node_modules/component-inherit/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/debug/browser.js","xmlhttprequest":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/xmlhttprequest.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -2535,173 +2840,7 @@ module.exports = function(opts) {
   }
 }
 
-},{"has-cors":"/home/gott/projects/ToxIn-client/node_modules/has-cors/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/component-emitter/index.js":[function(require,module,exports){
-
-/**
- * Expose `Emitter`.
- */
-
-module.exports = Emitter;
-
-/**
- * Initialize a new `Emitter`.
- *
- * @api public
- */
-
-function Emitter(obj) {
-  if (obj) return mixin(obj);
-};
-
-/**
- * Mixin the emitter properties.
- *
- * @param {Object} obj
- * @return {Object}
- * @api private
- */
-
-function mixin(obj) {
-  for (var key in Emitter.prototype) {
-    obj[key] = Emitter.prototype[key];
-  }
-  return obj;
-}
-
-/**
- * Listen on the given `event` with `fn`.
- *
- * @param {String} event
- * @param {Function} fn
- * @return {Emitter}
- * @api public
- */
-
-Emitter.prototype.on =
-Emitter.prototype.addEventListener = function(event, fn){
-  this._callbacks = this._callbacks || {};
-  (this._callbacks[event] = this._callbacks[event] || [])
-    .push(fn);
-  return this;
-};
-
-/**
- * Adds an `event` listener that will be invoked a single
- * time then automatically removed.
- *
- * @param {String} event
- * @param {Function} fn
- * @return {Emitter}
- * @api public
- */
-
-Emitter.prototype.once = function(event, fn){
-  var self = this;
-  this._callbacks = this._callbacks || {};
-
-  function on() {
-    self.off(event, on);
-    fn.apply(this, arguments);
-  }
-
-  on.fn = fn;
-  this.on(event, on);
-  return this;
-};
-
-/**
- * Remove the given callback for `event` or all
- * registered callbacks.
- *
- * @param {String} event
- * @param {Function} fn
- * @return {Emitter}
- * @api public
- */
-
-Emitter.prototype.off =
-Emitter.prototype.removeListener =
-Emitter.prototype.removeAllListeners =
-Emitter.prototype.removeEventListener = function(event, fn){
-  this._callbacks = this._callbacks || {};
-
-  // all
-  if (0 == arguments.length) {
-    this._callbacks = {};
-    return this;
-  }
-
-  // specific event
-  var callbacks = this._callbacks[event];
-  if (!callbacks) return this;
-
-  // remove all handlers
-  if (1 == arguments.length) {
-    delete this._callbacks[event];
-    return this;
-  }
-
-  // remove specific handler
-  var cb;
-  for (var i = 0; i < callbacks.length; i++) {
-    cb = callbacks[i];
-    if (cb === fn || cb.fn === fn) {
-      callbacks.splice(i, 1);
-      break;
-    }
-  }
-  return this;
-};
-
-/**
- * Emit `event` with the given args.
- *
- * @param {String} event
- * @param {Mixed} ...
- * @return {Emitter}
- */
-
-Emitter.prototype.emit = function(event){
-  this._callbacks = this._callbacks || {};
-  var args = [].slice.call(arguments, 1)
-    , callbacks = this._callbacks[event];
-
-  if (callbacks) {
-    callbacks = callbacks.slice(0);
-    for (var i = 0, len = callbacks.length; i < len; ++i) {
-      callbacks[i].apply(this, args);
-    }
-  }
-
-  return this;
-};
-
-/**
- * Return array of callbacks for `event`.
- *
- * @param {String} event
- * @return {Array}
- * @api public
- */
-
-Emitter.prototype.listeners = function(event){
-  this._callbacks = this._callbacks || {};
-  return this._callbacks[event] || [];
-};
-
-/**
- * Check if this emitter has `event` handlers.
- *
- * @param {String} event
- * @return {Boolean}
- * @api public
- */
-
-Emitter.prototype.hasListeners = function(event){
-  return !! this.listeners(event).length;
-};
-
-},{}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/debug/browser.js":[function(require,module,exports){
+},{"has-cors":"/home/gott/projects/ToxIn-client/node_modules/has-cors/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/debug/browser.js":[function(require,module,exports){
 
 /**
  * This is the web browser implementation of `debug()`.
@@ -3049,120 +3188,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/ms/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/ms/index.js":[function(require,module,exports){
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} options
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options){
-  options = options || {};
-  if ('string' == typeof val) return parse(val);
-  return options.long
-    ? long(val)
-    : short(val);
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  var match = /^((?:\d+)?\.?\d+) *(ms|seconds?|s|minutes?|m|hours?|h|days?|d|years?|y)?$/i.exec(str);
-  if (!match) return;
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'y':
-      return n * y;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 's':
-      return n * s;
-    case 'ms':
-      return n;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function short(ms) {
-  if (ms >= d) return Math.round(ms / d) + 'd';
-  if (ms >= h) return Math.round(ms / h) + 'h';
-  if (ms >= m) return Math.round(ms / m) + 'm';
-  if (ms >= s) return Math.round(ms / s) + 's';
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function long(ms) {
-  return plural(ms, d, 'day')
-    || plural(ms, h, 'hour')
-    || plural(ms, m, 'minute')
-    || plural(ms, s, 'second')
-    || ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, n, name) {
-  if (ms < n) return;
-  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
-  return Math.ceil(ms / n) + ' ' + name + 's';
-}
-
-},{}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/parseuri/index.js":[function(require,module,exports){
+},{"ms":"/home/gott/projects/ToxIn-client/node_modules/ms/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/parseuri/index.js":[function(require,module,exports){
 /**
  * Parses an URI
  *
@@ -4213,6 +4239,31 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
+},{}],"/home/gott/projects/ToxIn-client/node_modules/inherits/inherits_browser.js":[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
 },{}],"/home/gott/projects/ToxIn-client/node_modules/invariant/browser.js":[function(require,module,exports){
 (function (process){
 /**
@@ -31796,6 +31847,119 @@ while (l--) {
 }
 
 module.exports = mockconsole;
+
+},{}],"/home/gott/projects/ToxIn-client/node_modules/ms/index.js":[function(require,module,exports){
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} options
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options){
+  options = options || {};
+  if ('string' == typeof val) return parse(val);
+  return options.long
+    ? long(val)
+    : short(val);
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  var match = /^((?:\d+)?\.?\d+) *(ms|seconds?|s|minutes?|m|hours?|h|days?|d|years?|y)?$/i.exec(str);
+  if (!match) return;
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'y':
+      return n * y;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 's':
+      return n * s;
+    case 'ms':
+      return n;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function short(ms) {
+  if (ms >= d) return Math.round(ms / d) + 'd';
+  if (ms >= h) return Math.round(ms / h) + 'h';
+  if (ms >= m) return Math.round(ms / m) + 'm';
+  if (ms >= s) return Math.round(ms / s) + 's';
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function long(ms) {
+  return plural(ms, d, 'day')
+    || plural(ms, h, 'hour')
+    || plural(ms, m, 'minute')
+    || plural(ms, s, 'second')
+    || ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, n, name) {
+  if (ms < n) return;
+  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
+  return Math.ceil(ms / n) + ' ' + name + 's';
+}
 
 },{}],"/home/gott/projects/ToxIn-client/node_modules/object-assign/index.js":[function(require,module,exports){
 'use strict';
@@ -61767,7 +61931,7 @@ exports.connect = lookup;
 exports.Manager = require('./manager');
 exports.Socket = require('./socket');
 
-},{"./manager":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/manager.js","./socket":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/socket.js","./url":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/url.js","debug":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/node_modules/debug/debug.js","socket.io-parser":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/manager.js":[function(require,module,exports){
+},{"./manager":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/manager.js","./socket":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/socket.js","./url":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/url.js","debug":"/home/gott/projects/ToxIn-client/node_modules/debug/debug.js","socket.io-parser":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/manager.js":[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -62272,7 +62436,7 @@ Manager.prototype.onreconnect = function(){
   this.emitAll('reconnect', attempt);
 };
 
-},{"./on":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/on.js","./socket":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/socket.js","./url":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/url.js","backo2":"/home/gott/projects/ToxIn-client/node_modules/backo2/index.js","component-bind":"/home/gott/projects/ToxIn-client/node_modules/component-bind/index.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/node_modules/component-emitter/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/node_modules/debug/debug.js","engine.io-client":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/index.js","indexof":"/home/gott/projects/ToxIn-client/node_modules/indexof/index.js","object-component":"/home/gott/projects/ToxIn-client/node_modules/object-component/index.js","socket.io-parser":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/on.js":[function(require,module,exports){
+},{"./on":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/on.js","./socket":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/socket.js","./url":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/url.js","backo2":"/home/gott/projects/ToxIn-client/node_modules/backo2/index.js","component-bind":"/home/gott/projects/ToxIn-client/node_modules/component-bind/index.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/component-emitter/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/debug/debug.js","engine.io-client":"/home/gott/projects/ToxIn-client/node_modules/engine.io-client/index.js","indexof":"/home/gott/projects/ToxIn-client/node_modules/indexof/index.js","object-component":"/home/gott/projects/ToxIn-client/node_modules/object-component/index.js","socket.io-parser":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/on.js":[function(require,module,exports){
 
 /**
  * Module exports.
@@ -62685,7 +62849,7 @@ Socket.prototype.disconnect = function(){
   return this;
 };
 
-},{"./on":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/on.js","component-bind":"/home/gott/projects/ToxIn-client/node_modules/component-bind/index.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/node_modules/component-emitter/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/node_modules/debug/debug.js","has-binary":"/home/gott/projects/ToxIn-client/node_modules/has-binary/index.js","socket.io-parser":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/index.js","to-array":"/home/gott/projects/ToxIn-client/node_modules/to-array/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/url.js":[function(require,module,exports){
+},{"./on":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/on.js","component-bind":"/home/gott/projects/ToxIn-client/node_modules/component-bind/index.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/component-emitter/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/debug/debug.js","has-binary":"/home/gott/projects/ToxIn-client/node_modules/has-binary/index.js","socket.io-parser":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/index.js","to-array":"/home/gott/projects/ToxIn-client/node_modules/to-array/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/lib/url.js":[function(require,module,exports){
 (function (global){
 
 /**
@@ -62762,148 +62926,7 @@ function url(uri, loc){
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"debug":"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/node_modules/debug/debug.js","parseuri":"/home/gott/projects/ToxIn-client/node_modules/parseuri/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/node_modules/component-emitter/index.js":[function(require,module,exports){
-arguments[4]["/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/component-emitter/index.js"][0].apply(exports,arguments)
-},{}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-client/node_modules/debug/debug.js":[function(require,module,exports){
-
-/**
- * Expose `debug()` as the module.
- */
-
-module.exports = debug;
-
-/**
- * Create a debugger with the given `name`.
- *
- * @param {String} name
- * @return {Type}
- * @api public
- */
-
-function debug(name) {
-  if (!debug.enabled(name)) return function(){};
-
-  return function(fmt){
-    fmt = coerce(fmt);
-
-    var curr = new Date;
-    var ms = curr - (debug[name] || curr);
-    debug[name] = curr;
-
-    fmt = name
-      + ' '
-      + fmt
-      + ' +' + debug.humanize(ms);
-
-    // This hackery is required for IE8
-    // where `console.log` doesn't have 'apply'
-    window.console
-      && console.log
-      && Function.prototype.apply.call(console.log, console, arguments);
-  }
-}
-
-/**
- * The currently active debug mode names.
- */
-
-debug.names = [];
-debug.skips = [];
-
-/**
- * Enables a debug mode by name. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} name
- * @api public
- */
-
-debug.enable = function(name) {
-  try {
-    localStorage.debug = name;
-  } catch(e){}
-
-  var split = (name || '').split(/[\s,]+/)
-    , len = split.length;
-
-  for (var i = 0; i < len; i++) {
-    name = split[i].replace('*', '.*?');
-    if (name[0] === '-') {
-      debug.skips.push(new RegExp('^' + name.substr(1) + '$'));
-    }
-    else {
-      debug.names.push(new RegExp('^' + name + '$'));
-    }
-  }
-};
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-debug.disable = function(){
-  debug.enable('');
-};
-
-/**
- * Humanize the given `ms`.
- *
- * @param {Number} m
- * @return {String}
- * @api private
- */
-
-debug.humanize = function(ms) {
-  var sec = 1000
-    , min = 60 * 1000
-    , hour = 60 * min;
-
-  if (ms >= hour) return (ms / hour).toFixed(1) + 'h';
-  if (ms >= min) return (ms / min).toFixed(1) + 'm';
-  if (ms >= sec) return (ms / sec | 0) + 's';
-  return ms + 'ms';
-};
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-debug.enabled = function(name) {
-  for (var i = 0, len = debug.skips.length; i < len; i++) {
-    if (debug.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (var i = 0, len = debug.names.length; i < len; i++) {
-    if (debug.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-};
-
-/**
- * Coerce `val`.
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
-
-// persist
-
-try {
-  if (window.localStorage) debug.enable(localStorage.debug);
-} catch(e){}
-
-},{}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/binary.js":[function(require,module,exports){
+},{"debug":"/home/gott/projects/ToxIn-client/node_modules/debug/debug.js","parseuri":"/home/gott/projects/ToxIn-client/node_modules/parseuri/index.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/binary.js":[function(require,module,exports){
 (function (global){
 /*global Blob,File*/
 
@@ -63450,7 +63473,7 @@ function error(data){
   };
 }
 
-},{"./binary":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/binary.js","./is-buffer":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/is-buffer.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/node_modules/component-emitter/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/node_modules/debug/debug.js","isarray":"/home/gott/projects/ToxIn-client/node_modules/isarray/index.js","json3":"/home/gott/projects/ToxIn-client/node_modules/json3/lib/json3.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/is-buffer.js":[function(require,module,exports){
+},{"./binary":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/binary.js","./is-buffer":"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/is-buffer.js","component-emitter":"/home/gott/projects/ToxIn-client/node_modules/component-emitter/index.js","debug":"/home/gott/projects/ToxIn-client/node_modules/debug/debug.js","isarray":"/home/gott/projects/ToxIn-client/node_modules/isarray/index.js","json3":"/home/gott/projects/ToxIn-client/node_modules/json3/lib/json3.js"}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/is-buffer.js":[function(require,module,exports){
 (function (global){
 
 module.exports = isBuf;
@@ -63467,10 +63490,6 @@ function isBuf(obj) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/node_modules/component-emitter/index.js":[function(require,module,exports){
-arguments[4]["/home/gott/projects/ToxIn-client/node_modules/engine.io-client/node_modules/component-emitter/index.js"][0].apply(exports,arguments)
-},{}],"/home/gott/projects/ToxIn-client/node_modules/socket.io-parser/node_modules/debug/debug.js":[function(require,module,exports){
-arguments[4]["/home/gott/projects/ToxIn-client/node_modules/socket.io-client/node_modules/debug/debug.js"][0].apply(exports,arguments)
 },{}],"/home/gott/projects/ToxIn-client/node_modules/to-array/index.js":[function(require,module,exports){
 module.exports = toArray
 
@@ -63734,31 +63753,6 @@ function toArray(list, index) {
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"/home/gott/projects/ToxIn-client/node_modules/util/node_modules/inherits/inherits_browser.js":[function(require,module,exports){
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
 },{}],"/home/gott/projects/ToxIn-client/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
@@ -64356,7 +64350,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":"/home/gott/projects/ToxIn-client/node_modules/util/support/isBufferBrowser.js","_process":"/home/gott/projects/ToxIn-client/node_modules/process/browser.js","inherits":"/home/gott/projects/ToxIn-client/node_modules/util/node_modules/inherits/inherits_browser.js"}],"/home/gott/projects/ToxIn-client/node_modules/webrtc-adapter/src/js/adapter_core.js":[function(require,module,exports){
+},{"./support/isBuffer":"/home/gott/projects/ToxIn-client/node_modules/util/support/isBufferBrowser.js","_process":"/home/gott/projects/ToxIn-client/node_modules/process/browser.js","inherits":"/home/gott/projects/ToxIn-client/node_modules/inherits/inherits_browser.js"}],"/home/gott/projects/ToxIn-client/node_modules/webrtc-adapter/src/js/adapter_core.js":[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -68083,6 +68077,7 @@ module.exports = React.createClass({displayName: "exports",
     }
   },
   closeWindow() {
+    this.state.rtc.stopLocalVideo();
     this.state.rtc.leaveRoom();
     this.props.closeWindow();
   },

@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
+from django.views.generic import RedirectView
 
 from api import views
 
@@ -26,4 +27,5 @@ urlpatterns = [
     path('contacts-list/', views.ContactsListView.as_view(), name='contacts-list'),
     path('create-contact/', views.CreateContactView.as_view(), name='create-contact'),
     path('create-group/', views.CreateGroupView.as_view(), name='create-group'),
+    path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
 ]
