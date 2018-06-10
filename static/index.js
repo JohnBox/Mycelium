@@ -67085,16 +67085,10 @@ module.exports = React.createClass({displayName: "exports",
   onSnackBar() {
     this.refs.snack.show();
     setTimeout(()=>{this.refs.snack.dismiss()}, 4000);
-    const user = this.context.router.getCurrentParams().user;
-    $.ajax({
-      url: this.props.url + 'create-contact/',
-      method: 'POST',
-      data: {user: user, contact: this.props.user[0]}
-    });
   },
   render() {
     const style = this.getStyles();
-    const message = this.props.user[1] + ' доданий у контакти';
+    const message = ' доданий у контакти';
     return (
       React.createElement("span", null, 
       React.createElement("span", {className: "add_contact"}, 
@@ -67217,7 +67211,45 @@ module.exports = React.createClass({displayName: "exports",
   }
 });
 
-},{"material-ui":"/home/gott/projects/ToxIn-client/node_modules/material-ui/lib/index.js","react":"/home/gott/projects/ToxIn-client/node_modules/react/react.js","react-router":"/home/gott/projects/ToxIn-client/node_modules/react-router/lib/index.js"}],"/home/gott/projects/ToxIn-client/src/components/Button/ToggleButton.js":[function(require,module,exports){
+},{"material-ui":"/home/gott/projects/ToxIn-client/node_modules/material-ui/lib/index.js","react":"/home/gott/projects/ToxIn-client/node_modules/react/react.js","react-router":"/home/gott/projects/ToxIn-client/node_modules/react-router/lib/index.js"}],"/home/gott/projects/ToxIn-client/src/components/Button/RoomNameButton.js":[function(require,module,exports){
+const React = require('react');
+const $ = require('jquery');
+const mui = require('material-ui');
+const { IconButton, SvgIcon, Snackbar } = mui;
+const StylePropable = mui.Mixins.StylePropable;
+
+module.exports = React.createClass({displayName: "exports",
+  mixins: [StylePropable],
+  contextTypes: {
+    muiTheme: React.PropTypes.object,
+    router: React.PropTypes.func
+  },
+  getDefaultProps() {
+    return {url: 'http://127.0.0.1:8000/'};
+  },
+  getTheme() {
+    return this.context.muiTheme.palette;
+  },
+  getStyles: function() {
+    return {
+      color: this.getTheme().textColor,
+      fontSize: '1.4em',
+      padding: '0',
+      margin: '0',
+      marginTop: '20px'
+    };
+  },
+  render() {
+    const style = this.getStyles();
+    return (
+      React.createElement("div", {className: "profile_button", style: style}, 
+        this.props.title
+      )
+    );
+  }
+});
+
+},{"jquery":"/home/gott/projects/ToxIn-client/node_modules/jquery/dist/jquery.js","material-ui":"/home/gott/projects/ToxIn-client/node_modules/material-ui/lib/index.js","react":"/home/gott/projects/ToxIn-client/node_modules/react/react.js"}],"/home/gott/projects/ToxIn-client/src/components/Button/ToggleButton.js":[function(require,module,exports){
 const React = require('react');
 const { IconButton, SvgIcon } = require('material-ui');
 
@@ -67307,7 +67339,9 @@ const $ = require('jquery');
 const mui = require('material-ui');
 const { AppBar, Paper, RaisedButton, FontIcon } = mui;
 const Transitions = mui.Styles.Transitions;
+const StylePropable = mui.Mixins.StylePropable;
 const OutButton = require('./../Button/OutButton');
+const RoomNameButton = require('./../Button/RoomNameButton');
 const ToggleButton = require('./../Button/ToggleButton');
 const ProfileWindow = require('../Window/ProfileWindow');
 const UserWindow = require('../Window/UserWindow');
@@ -67318,6 +67352,19 @@ const AudienceWindow = require('../Window/AudienceWindow');
 const windowTypes = require('../windows');
 
 module.exports = React.createClass({displayName: "exports",
+  mixins: [StylePropable],
+  contextTypes: {
+    muiTheme: React.PropTypes.object
+  },
+  getTheme() {
+    return this.context.muiTheme.palette;
+  },
+  getStyles: function() {
+    return {
+      userSelect: 'none',
+      color: this.getTheme().textColor
+    };
+  },
   render() {
     let window;
     switch (this.props.window) {
@@ -67349,9 +67396,11 @@ module.exports = React.createClass({displayName: "exports",
       default:
         window = null;
     }
+    const style = this.getStyles();
+    let title = this.props.data?this.props.data.name:'';
     return (
       React.createElement("div", {className: "container"}, 
-        React.createElement(AppBar, {title: "", 
+        React.createElement(AppBar, {title: React.createElement(RoomNameButton, {title: title}), 
                 iconElementLeft: React.createElement(ToggleButton, {togglePanel: this.props.togglePanel}), 
                 iconElementRight: React.createElement(OutButton, null), 
                 zDepth: 0}), 
@@ -67361,7 +67410,7 @@ module.exports = React.createClass({displayName: "exports",
   }
 });
 
-},{"../Window/AudienceWindow":"/home/gott/projects/ToxIn-client/src/components/Window/AudienceWindow.js","../Window/ContactWindow":"/home/gott/projects/ToxIn-client/src/components/Window/ContactWindow.js","../Window/ProfileWindow":"/home/gott/projects/ToxIn-client/src/components/Window/ProfileWindow.js","../Window/RoomWindow":"/home/gott/projects/ToxIn-client/src/components/Window/RoomWindow.js","../Window/UserWindow":"/home/gott/projects/ToxIn-client/src/components/Window/UserWindow.js","../Window/VideoWindow":"/home/gott/projects/ToxIn-client/src/components/Window/VideoWindow.js","../windows":"/home/gott/projects/ToxIn-client/src/components/windows.js","./../Button/OutButton":"/home/gott/projects/ToxIn-client/src/components/Button/OutButton.js","./../Button/ToggleButton":"/home/gott/projects/ToxIn-client/src/components/Button/ToggleButton.js","jquery":"/home/gott/projects/ToxIn-client/node_modules/jquery/dist/jquery.js","js-cookie":"/home/gott/projects/ToxIn-client/node_modules/js-cookie/src/js.cookie.js","material-ui":"/home/gott/projects/ToxIn-client/node_modules/material-ui/lib/index.js","react":"/home/gott/projects/ToxIn-client/node_modules/react/react.js","react-router":"/home/gott/projects/ToxIn-client/node_modules/react-router/lib/index.js"}],"/home/gott/projects/ToxIn-client/src/components/Main/MainPage.js":[function(require,module,exports){
+},{"../Window/AudienceWindow":"/home/gott/projects/ToxIn-client/src/components/Window/AudienceWindow.js","../Window/ContactWindow":"/home/gott/projects/ToxIn-client/src/components/Window/ContactWindow.js","../Window/ProfileWindow":"/home/gott/projects/ToxIn-client/src/components/Window/ProfileWindow.js","../Window/RoomWindow":"/home/gott/projects/ToxIn-client/src/components/Window/RoomWindow.js","../Window/UserWindow":"/home/gott/projects/ToxIn-client/src/components/Window/UserWindow.js","../Window/VideoWindow":"/home/gott/projects/ToxIn-client/src/components/Window/VideoWindow.js","../windows":"/home/gott/projects/ToxIn-client/src/components/windows.js","./../Button/OutButton":"/home/gott/projects/ToxIn-client/src/components/Button/OutButton.js","./../Button/RoomNameButton":"/home/gott/projects/ToxIn-client/src/components/Button/RoomNameButton.js","./../Button/ToggleButton":"/home/gott/projects/ToxIn-client/src/components/Button/ToggleButton.js","jquery":"/home/gott/projects/ToxIn-client/node_modules/jquery/dist/jquery.js","js-cookie":"/home/gott/projects/ToxIn-client/node_modules/js-cookie/src/js.cookie.js","material-ui":"/home/gott/projects/ToxIn-client/node_modules/material-ui/lib/index.js","react":"/home/gott/projects/ToxIn-client/node_modules/react/react.js","react-router":"/home/gott/projects/ToxIn-client/node_modules/react-router/lib/index.js"}],"/home/gott/projects/ToxIn-client/src/components/Main/MainPage.js":[function(require,module,exports){
 const React = require('react');
 const Router = require('react-router');
 const { Route, RouteHandler, Link, Navigation } = Router;
@@ -67403,7 +67452,7 @@ module.exports = React.createClass({displayName: "exports",
         display: this.state.openPanel?'flex':'none',
       },
       container: {
-        transition: Transitions.easeOut('0ms')
+        transition: Transitions.easeOut('10ms')
       }
     };
   },
@@ -67541,10 +67590,12 @@ module.exports = React.createClass({displayName: "exports",
     this.props.openWindow(windowTypes.CONTACT, this.state.contacts[i]);
   },
   onRoomClick(e,i) {
-    this.props.openWindow(windowTypes.VIDEO, this.state.rooms[i]);
+    let room = this.state.rooms[i];
+    this.props.openWindow(windowTypes.VIDEO, room);
   },
   onAudienceClick(e,i) {
-    this.props.openWindow(windowTypes.VIDEO, this.state.audiences[i]);
+    let audience = this.state.audiences[i];
+    this.props.openWindow(windowTypes.VIDEO, audience);
   },
   createAudience() {
     this.props.openWindow(windowTypes.AUDIENCE, this.state.contacts);
@@ -67569,7 +67620,11 @@ module.exports = React.createClass({displayName: "exports",
   },
   render() {
     let rooms = [], audiences = [], contacts = [];
-    if (!this.state.contacts && !this.state.rooms && !this.state.audiences) {
+    if (Cookie.get('updateContactsList') === 'true' ||
+      (!this.state.contacts && !this.state.rooms && !this.state.audiences)) {
+      if (Cookie.get('updateContactsList') === 'true') {
+        Cookie.remove('updateContactsList');
+      }
       this.getAllContacts().then((res)=>{console.log(res.a);this.setState({
         contacts: res.a.contacts, rooms: res.a.rooms, audiences: res.a.audiences})});
     } else {
@@ -67688,13 +67743,22 @@ const { AppBar, Paper, Menu } = mui;
 const Cookies = require('js-cookie');
 
 module.exports = React.createClass({displayName: "exports",
-  onToggle() {
-    Cookies.set('darkTheme', Cookies.get('darkTheme') !== 'true');
-    this.props.toggleTheme();
+  getInitialState() {
+    return {showSelfVideo: true};
+  },
+  onToggle(e,i) {
+    if (i === 0) {
+      Cookies.set('darkTheme', Cookies.get('darkTheme') !== 'true');
+      this.props.toggleTheme();
+    } else {
+      this.setState({showSelfVideo: !this.state.showSelfVideo});
+      Cookies.set('showSelfVideo', e.target.checked);
+    }
   },
   render() {
     const settings = [
-      { text: 'Тема', toggle: true, defaultChecked: this.props.darkTheme }
+      { text: 'Тема', toggle: true, checked: this.props.darkTheme},
+      { text: 'Показувати своє відео', toggle: true, checked: this.state.showSelfVideo},
     ];
     return (
       React.createElement("div", {className: "setting_tab"}, 
@@ -67802,12 +67866,15 @@ const CloseButton = require('../Button/CloseWindow');
 
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
+  getInitialState() {
+    return {contact: this.props.contact}
+  },
   getDefaultProps() {
     return {url: 'http://127.0.0.1:8000/'};
   },
   deleteContact() {
     const user = Cookie.getJSON('user');
-    const contact = this.props.contact;
+    const contact = this.state.contact;
     ajax({
       url: this.props.url + 'delete-contact/',
       method: 'POST',
@@ -67818,12 +67885,20 @@ module.exports = React.createClass({displayName: "exports",
     });
     this.props.closeWindow();
   },
+  componentWillReceiveProps(next) {
+    if (next.contact !== this.state.contact) {
+      this.setState({contact: next.contact});
+    }
+  },
   render() {
     const contact = this.props.contact;
-    contact.date_joined = contact.date_joined.split('T')[0] + ' '
-      + contact.date_joined.split('T')[1].split('.')[0];
+    let date_joined = '', last_login = '';
+    if (contact.date_joined) {
+      date_joined = contact.date_joined.split('T')[0] + ' '
+        + contact.date_joined.split('T')[1].split('.')[0];
+    }
     if (contact.last_login) {
-      contact.last_login = contact.last_login.split('T')[0] + ' '
+      last_login = contact.last_login.split('T')[0] + ' '
         + contact.last_login.split('T')[1].split('.')[0];
     }
     return (
@@ -67836,8 +67911,8 @@ module.exports = React.createClass({displayName: "exports",
           React.createElement(TextField, {disabled: true, value: contact.email, floatingLabelText: "Електронна пошта"}), 
           React.createElement(TextField, {disabled: true, value: contact.workplace, floatingLabelText: "Місце роботи"}), 
           React.createElement(TextField, {disabled: true, value: contact.position, floatingLabelText: "Посада"}), 
-          React.createElement(TextField, {disabled: true, value: contact.date_joined, floatingLabelText: "Перше підключення"}), 
-          React.createElement(TextField, {disabled: true, value: contact.last_login, floatingLabelText: "Останне підключеня"})
+          React.createElement(TextField, {disabled: true, value: date_joined, floatingLabelText: "Перше підключення"}), 
+          React.createElement(TextField, {disabled: true, value: last_login, floatingLabelText: "Останне підключеня"})
         ), 
         React.createElement("div", {className: "img"}, 
           React.createElement(RaisedButton, {secondary: true, style: {width: '100%'}, label: "Видалити", onClick: this.deleteContact})
@@ -68065,7 +68140,7 @@ module.exports = React.createClass({displayName: "exports",
   },
   addContact() {
     const user = Cookie.getJSON('user');
-    const contact = this.props.data;
+    const contact = this.props.user;
     ajax({
       url: this.props.url + 'create-contact/',
       method: 'POST',
@@ -68074,11 +68149,11 @@ module.exports = React.createClass({displayName: "exports",
         contact: contact.username
       }
     });
+    Cookie.set('updateContactsList', true);
     this.props.closeWindow();
   },
   render() {
     const user = Cookie.getJSON('user');
-    console.log(this.props.data);
     const contact = this.props.user;
     let label, disabled = user.contacts.includes(contact.id);
     if (disabled) {
@@ -68117,27 +68192,26 @@ const SimpleWebRTC = require('simplewebrtc');
 const CloseButton = require('../Button/CloseWindow');
 
 
-let localStream;
-
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://127.0.0.1:8000/', contact: null};
+    return {url: 'http://127.0.0.1:8000/', data: null};
   },
   getInitialState() {
     return {rtc: new SimpleWebRTC({
       localVideoEl: 'localVideo',
       remoteVideosEl: 'remotesVideos',
       autoRequestMedia: true
-    })};
+    }),
+    showSelf: Cookie.get('showSelfVideo') === 'true'};
   },
   componentWillMount() {
-    this.setState({contact: this.props.contact});
-    this.state.rtc.joinRoom(this.state.contact);
+    this.setState({data: this.props.data});
+    this.state.rtc.joinRoom(this.state.data);
   },
   componentWillReceiveProps(next) {
-    if (next.contact !== this.state.contact) {
-      this.setState({contact: next.contact});
+    if (next.data !== this.state.data) {
+      this.setState({data: next.data});
     }
   },
   closeWindow() {
@@ -68146,14 +68220,12 @@ module.exports = React.createClass({displayName: "exports",
     this.props.closeWindow();
   },
   render() {
-
     return (
       React.createElement(Paper, {className: "window", zDepth: 1, rounded: false}, 
         React.createElement(CloseButton, {onClick: this.closeWindow}), 
-        React.createElement("h4", null, this.state.contact), 
         React.createElement("div", {className: "video_room"}, 
           React.createElement("div", {id: "remotesVideos"}, 
-            React.createElement("video", {id: "localVideo", autoPlay: true})
+            this.state.showSelf?React.createElement("video", {id: "localVideo", autoPlay: true}):null
           )
         )
       )
