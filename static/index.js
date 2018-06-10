@@ -68220,6 +68220,9 @@ module.exports = React.createClass({displayName: "exports",
     this.props.closeWindow();
   },
   render() {
+    this.state.rtc.connection.on('videoAdder', function (el, peer) {
+      alert('NEW VIDEO');
+    });
     return (
       React.createElement(Paper, {className: "window", zDepth: 1, rounded: false}, 
         React.createElement(CloseButton, {onClick: this.closeWindow}), 
