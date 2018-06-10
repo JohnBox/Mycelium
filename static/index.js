@@ -66853,9 +66853,9 @@ const GitHubButton = require('../Button/GitHubButton');
 module.exports = React.createClass({displayName: "exports",
   render: function () {
     return (
-      React.createElement("div", {className: "about"}, 
-        React.createElement(GitHubButton, {href: "https://github.com/JohnBox/ToxIn-client"}), 
-        React.createElement(GitHubButton, {href: "https://github.com/JohnBox/ToxIn-server"})
+      React.createElement("div", {className: "about"}
+        /*<GitHubButton href='https://github.com/JohnBox/ToxIn-client'/>*/
+        /*<GitHubButton href='https://github.com/JohnBox/ToxIn-server'/>*/
       )
     );
   }
