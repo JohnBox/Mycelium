@@ -68225,7 +68225,7 @@ module.exports = React.createClass({displayName: "exports",
         React.createElement(CloseButton, {onClick: this.closeWindow}), 
         React.createElement("div", {className: "video_room"}, 
           React.createElement("div", {id: "remotesVideos"}, 
-            this.state.showSelf?React.createElement("video", {id: "localVideo", autoPlay: true}):null
+            this.state.showSelf?React.createElement("video", {id: "localVideo", muted: true, autoPlay: true}):null
           )
         )
       )
