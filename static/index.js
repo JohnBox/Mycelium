@@ -68221,7 +68221,7 @@ module.exports = React.createClass({displayName: "exports",
   },
   render() {
     this.state.rtc.connection.on('videoAdded', function (el, peer) {
-      alert('NEW VIDEO');
+      console.log('NEW VIDEO');
     });
     return (
       React.createElement(Paper, {className: "window", zDepth: 1, rounded: false}, 
