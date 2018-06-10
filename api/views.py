@@ -123,6 +123,21 @@ class CreateContactView(View):
         return JsonResponse({'a': True})
 
 
+class DeleteContactView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(DeleteContactView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        username = request.POST['user']
+        contact_username = request.POST['contact']
+        user = User.objects.get_by_natural_key(username)
+        contact = User.objects.get_by_natural_key(contact_username)
+        user.contacts.remove(contact)
+        user.save()
+        return JsonResponse({'a': True})
+
+
 class CreateGroupView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

@@ -26,6 +26,7 @@ urlpatterns = [
     path('user-edit/', views.UserEditView.as_view(), name='user-edit'),
     path('contacts-list/', views.ContactsListView.as_view(), name='contacts-list'),
     path('create-contact/', views.CreateContactView.as_view(), name='create-contact'),
+    path('delete-contact/', views.DeleteContactView.as_view(), name='delete-contact'),
     path('create-group/', views.CreateGroupView.as_view(), name='create-group'),
     path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
 ]

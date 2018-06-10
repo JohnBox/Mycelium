@@ -199,3 +199,9 @@ body {
   display: flex;
   flex-direction: column;
 }
+.info {
+  margin-bottom: 32px;
+}
+.info > div {
+  margin: 0 16px 0 56px;
+}
