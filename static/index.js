@@ -68220,7 +68220,7 @@ module.exports = React.createClass({displayName: "exports",
     this.props.closeWindow();
   },
   render() {
-    this.state.rtc.connection.on('videoAdder', function (el, peer) {
+    this.state.rtc.connection.on('videoAdded', function (el, peer) {
       alert('NEW VIDEO');
     });
     return (
