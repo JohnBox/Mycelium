@@ -68207,7 +68207,7 @@ module.exports = React.createClass({displayName: "exports",
   },
   componentWillMount() {
     this.setState({data: this.props.data});
-    this.state.rtc.joinRoom(this.state.data);
+    this.state.rtc.joinRoom(this.props.data.name);
   },
   componentWillReceiveProps(next) {
     if (next.data !== this.state.data) {
