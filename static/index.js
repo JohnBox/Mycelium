@@ -60788,7 +60788,7 @@ SDPUtils.parseMsid = function(mediaSection) {
 SDPUtils.writeSessionBoilerplate = function() {
   // FIXME: sess-id should be an NTP timestamp.
   return 'v=0\r\n' +
-      'o=thisisadapterortc 8169639915646943137 2 IN IP4 93.73.179.185\r\n' +
+      'o=thisisadapterortc 8169639915646943137 2 IN IP4 127.0.0.1\r\n' +
       's=-\r\n' +
       't=0 0\r\n';
 };
@@ -67757,7 +67757,7 @@ module.exports = React.createClass({displayName: "exports",
   },
   render() {
     const settings = [
-      { text: 'Тема', toggle: true, checked: this.props.darkTheme},
+      { text: 'Темна тема', toggle: true, checked: this.props.darkTheme},
       { text: 'Показувати своє відео', toggle: true, checked: this.state.showSelfVideo},
     ];
     return (
