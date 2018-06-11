@@ -68203,7 +68203,7 @@ module.exports = React.createClass({displayName: "exports",
       remoteVideosEl: 'remotesVideos',
       autoRequestMedia: true
     }),
-    showSelf: Cookie.get('showSelfVideo')?Cookie.get('showSelfVideo'):true};
+    showSelf: Cookie.get('showSelfVideo')?Cookie.get('showSelfVideo') === 'true':true};
   },
   componentWillMount() {
     this.setState({data: this.props.data});
