@@ -5,9 +5,20 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from django.views.generic.base import View
 from django.db.models import Q
+from rest_framework import generics
 
 from .models import User, Group
 from .serializers import UserSerializer, GroupSerializer
+
+
+class UserList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class GroupList(generics.ListCreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 
 class HomeView(View):

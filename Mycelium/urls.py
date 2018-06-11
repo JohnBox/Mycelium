@@ -29,4 +29,7 @@ urlpatterns = [
     path('delete-contact/', views.DeleteContactView.as_view(), name='delete-contact'),
     path('create-group/', views.CreateGroupView.as_view(), name='create-group'),
     path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
+
+    path('users/', views.UserList.as_view(), name='users'),
+    path('groups/', views.GroupList.as_view(), name='groups'),
 ]

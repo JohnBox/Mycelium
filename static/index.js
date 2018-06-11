@@ -60788,7 +60788,7 @@ SDPUtils.parseMsid = function(mediaSection) {
 SDPUtils.writeSessionBoilerplate = function() {
   // FIXME: sess-id should be an NTP timestamp.
   return 'v=0\r\n' +
-      'o=thisisadapterortc 8169639915646943137 2 IN IP4 192.168.31.128\r\n' +
+      'o=thisisadapterortc 8169639915646943137 2 IN IP4 93.73.179.185\r\n' +
       's=-\r\n' +
       't=0 0\r\n';
 };
@@ -66872,7 +66872,7 @@ const { RaisedButton, TextField } = require('material-ui');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   getInitialState() {
     return {username: '', password: ''};
@@ -66927,7 +66927,7 @@ const { RaisedButton, TextField } = require('material-ui');
 
 module.exports = React.createClass({displayName: "exports",
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'}
+    return {url: 'http://93.73.179.185:8000/'}
   },
   getInitialState() {
     return {username: '', first_name: '',last_name: '', email: '', password: '', confirm_password: ''};
@@ -67067,7 +67067,7 @@ module.exports = React.createClass({displayName: "exports",
     router: React.PropTypes.func
   },
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   getTheme() {
     return this.context.muiTheme.palette;
@@ -67225,7 +67225,7 @@ module.exports = React.createClass({displayName: "exports",
     router: React.PropTypes.func
   },
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   getTheme() {
     return this.context.muiTheme.palette;
@@ -67569,7 +67569,7 @@ const windowTypes = require('../windows');
 
 module.exports = React.createClass({displayName: "exports",
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   getInitialState() {
     return {contacts: null, rooms: null, audiences: null};
@@ -67677,7 +67677,7 @@ module.exports = React.createClass({displayName: "exports",
     router: React.PropTypes.func
   },
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   getInitialState() {
     return {users: null};
@@ -67789,7 +67789,7 @@ const GHB = require('../Button/GitHubButton');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   getInitialState() {
     return {contacts: [], name: null};
@@ -67870,7 +67870,7 @@ module.exports = React.createClass({displayName: "exports",
     return {contact: this.props.contact}
   },
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   deleteContact() {
     const user = Cookie.getJSON('user');
@@ -67934,7 +67934,7 @@ const CloseButton = require('../Button/CloseWindow');
 
 module.exports = React.createClass({displayName: "exports",
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   getInitialState() {
     return {edit: false, user: Cookie.getJSON('user')};
@@ -68051,7 +68051,7 @@ const windowTypes = require('../windows');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   getInitialState() {
     return {contacts: [], name: null};
@@ -68136,7 +68136,7 @@ const CloseButton = require('../Button/CloseWindow');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/'};
+    return {url: 'http://93.73.179.185:8000/'};
   },
   addContact() {
     const user = Cookie.getJSON('user');
@@ -68195,7 +68195,7 @@ const CloseButton = require('../Button/CloseWindow');
 module.exports = React.createClass({displayName: "exports",
   mixins: [Navigation],
   getDefaultProps() {
-    return {url: 'http://192.168.31.128:8000/', data: null};
+    return {url: 'http://93.73.179.185:8000/', data: null};
   },
   getInitialState() {
     return {rtc: new SimpleWebRTC({
